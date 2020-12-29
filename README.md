@@ -67,3 +67,4 @@ All implemented changes will be listed here as possible.
 - Remove assets useless anymore.
 - Remove function that setting system proxy.
 - Remove things that do not affect on actual bypassing on CLI.
+- Remove GitHub integrations.
