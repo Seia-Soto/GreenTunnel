@@ -37,10 +37,13 @@ export default (opts = {}) => {
 
       debug('proxying:', hostname, port)
 
+      // NOTE: Query DNS;
+      const address = await opts.dns.client(hostname)
       // NOTE: Connect to remote server;
       const remote = await connect({
         host: hostname,
-        port: secured ? 443 : (port || 80)
+        port: secured ? 443 : (port || 80),
+        ip: address
       })
 
       // NOTE: If remote server send data to us;
