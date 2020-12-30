@@ -1,6 +1,6 @@
 # Seia-Soto/GreenTunnel
 
-Packet fragmentation.
+Bypassing DPIs.
 
 > **Notice**
 >
@@ -54,11 +54,14 @@ All implemented changes will be listed here as possible.
 
 - Add eslint-standard rules.
 
-### Updates
+### Changes
 
 - Update ESLint package and rules.
 - Update LICENSE and package.json file.
 - Update packages.
+- Change `ip` option to `bind`.
+- Improve for loops to IL method.
+- Change logging policy.
 
 ### Removals
 
@@ -68,3 +71,4 @@ All implemented changes will be listed here as possible.
 - Remove function that setting system proxy.
 - Remove things that do not affect on actual bypassing on CLI.
 - Remove GitHub integrations.
+- Remove useless duplicated parts in HTTP/HTTPS handler.

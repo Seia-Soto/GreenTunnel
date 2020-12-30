@@ -1,7 +1,7 @@
 {
   "name": "green-tunnel",
   "version": "1.8.0",
-  "description": "Packet fragmentation.",
+  "description": "Bypassing DPIs.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Seia-Soto/GreenTunnel.git"
@@ -11,26 +11,17 @@
     "Seia-Soto <seia@outlook.kr>",
     "Sadegh Hayeri"
   ],
-  "files": [
-    "bin",
-    "src"
-  ],
   "main": "src/index.cjs.js",
   "module": "src/index.js",
-  "bin": {
-    "green-tunnel": "bin/gt.js",
-    "gt": "bin/gt.js"
-  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "cli": "node bin/gt"
+    "test": "cross-env DEBUG=* node -r esm scripts/test"
   },
   "dependencies": {
     "app-data-folder": "^1.0.0",
     "chalk": "^2.4.2",
     "clear": "^0.1.0",
     "consola": "^2.11.0",
-    "debug": "^4.1.1",
+    "debug": "^4.3.1",
     "dns-over-http": "^0.1.2",
     "dns-over-tls": "0.0.6",
     "esm": "^3.2.22",
