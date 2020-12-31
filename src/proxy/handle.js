@@ -54,7 +54,7 @@ export default (opts = {}) => {
           if (response.statusCode === '302') {
             debug('preventing redirect from DPI and sending same request again to:', hostname)
 
-            return
+            return remote.write(data)
           }
         }
 
@@ -87,7 +87,7 @@ export default (opts = {}) => {
 
           buffer = http.compile.request(request, opts.spoofHTTP)
 
-          remote.write(data)
+          remote.write(buffer)
         })
 
         const request = http.resolve.request(data)
