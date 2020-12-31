@@ -4,7 +4,7 @@ const resolveHeader = (headers = []) => {
   for (let i = 0, l = headers.length; i < l; i++) {
     const [key, ...value] = headers[i].split(':')
 
-    data[key.toLowerCase()] = value.join(':')
+    data[key.toLowerCase().trim()] = value.join(':').trim()
   }
 
   return data

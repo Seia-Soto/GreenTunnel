@@ -39,7 +39,9 @@ import { proxy } from 'Seia-Soto/GreenTunnel'
 
 const server = proxy.create({
   port: 8080,
-  fragmentation: 96, // NOTE: fragmentation level (buffer length)
+  fragmentation: 64, // NOTE: fragmentation level (buffer length)
+  spoofHTTP: true, // NOTE: spoof pure-HTTP headers
+  preventRedirect: true, // NOTE: prevent being redirected via DPI
   dns: {
     type: 'https',
     options: {},
@@ -254,6 +256,8 @@ All implemented changes will be listed here as possible.
 - Add options to customize DNS client and its cache client.
 - Add DNS cache clients.
 - Add DNS clients.
+- Add HOST header obfuscation.
+- Add 302 Found redirect prevention.
 
 ### Changes
 

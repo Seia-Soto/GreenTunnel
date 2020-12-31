@@ -1,6 +1,6 @@
 import compileHeaders from './headers'
 
-const compile = (request = {}) => {
+const compile = (request = {}, spoof) => {
   request.version = request.version || 'HTTP/1.1'
   request.path = request.path || '/'
   request.method = request.method || 'GET'
@@ -9,9 +9,13 @@ const compile = (request = {}) => {
 
   let packet = ''
 
-  packet += `${request.method} ${request.path} ${request.version}\r\n`
+  packet += request.method.toUpperCase()
 
-  packet += compileHeaders(request.headers)
+  if (spoof) packet += '    '
+
+  packet += ` ${request.path} ${request.version}\r\n`
+
+  packet += compileHeaders(request.headers, spoof)
 
   packet += '\r\n'
   packet += request.payload

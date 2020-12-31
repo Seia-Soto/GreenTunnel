@@ -33,71 +33,71 @@ export default (opts = {}) => {
       )
 
       // NOTE: Validate domain;
-      if (hostname.indexOf('.') < 0) return
+      const ipPattern = /^((25[0-5]|(2[0-4]|1[0-9]|[1-9]|)[0-9])(\.(?!$)|$)){4}$/i
 
-      debug('proxying:', hostname, port)
+      debug('proxying:', hostname, '/secured', secured)
 
-      // NOTE: Query DNS;
-      const address = await opts.dns.client(hostname)
       // NOTE: Connect to remote server;
       const remote = await connect({
         host: hostname,
         port: secured ? 443 : (port || 80),
-        ip: address
+        ip: ipPattern.test(hostname)
+          ? undefined
+          : await opts.dns.client(hostname) // NOTE: Query DNS;
       })
 
       // NOTE: If remote server send data to us;
       remote.on('data', buffer => {
-        try {
-          // NOTE: Give data to client without fragmentation;
-          connection.write(buffer)
-        } catch (error) {
-          debug('error while receiving data:', error)
+        if (!secured && opts.preventRedirect) {
+          const response = http.resolve.response(buffer)
+
+          if (response.statusCode === '302') {
+            debug('preventing redirect from DPI and sending same request again to:', hostname)
+
+            return
+          }
         }
+
+        connection.write(buffer)
       })
 
-      // NOTE: If client trys to send data to remote;
       if (secured) {
-        // NOTE: Apply fragmentation on initial HTTPS connection;
+        // NOTE: If client trys to send data to remote;
         connection.once('data', initBuffer => {
           debug('appyling packet fragmentation:', hostname)
 
           for (let i = 0, l = initBuffer.length; i < l; i += opts.fragmentation) {
-            try {
-              remote.write(initBuffer.slice(i, i + opts.fragmentation))
-            } catch (error) {
-              debug('error while sending data:', error)
-            }
+            remote.write(initBuffer.slice(i, i + opts.fragmentation))
           }
 
           connection.on('data', buffer => remote.write(buffer))
         })
-      } else {
-        connection.on('data', buffer => {
-          // NOTE: Remove 'proxy-connection' header;
-          debug('removing proxy headers')
 
+        const packet = http.compile.response({
+          statusMessgae: 'Connection Established'
+        })
+
+        connection.write(packet)
+      } else {
+        // NOTE: If client trys to send data to remote;
+        connection.on('data', buffer => {
           const request = http.resolve.request(buffer)
 
           delete request.headers['proxy-connection']
 
-          buffer = http.compile.request(request)
+          buffer = http.compile.request(request, opts.spoofHTTP)
 
-          remote.write(buffer)
+          remote.write(data)
         })
-      }
 
-      if (secured) {
-        debug('sending connection established signal of:', hostname)
+        const request = http.resolve.request(data)
 
-        try {
-          const packet = http.compile.response({
-            statusMessgae: 'Connection Established'
-          })
+        delete request.headers['proxy-connection']
 
-          connection.write(packet)
-        } catch (error) {
-          console.error(error)
+        data = http.compile.request(request, opts.spoofHTTP)
+
+        for (let i = 0, l = data.length; i < l; i += opts.fragmentation / 2) {
+          remote.write(data.slice(i, i + opts.fragmentation / 2))
         }
       }
 

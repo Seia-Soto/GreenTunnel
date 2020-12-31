@@ -7,8 +7,11 @@ import handle from './handle'
 const debug = createLogger('proxy/create')
 
 const createProxy = (opts = {}) => {
+  // NOTE: App;
   opts.port = opts.port || 8080
-  opts.fragmentation = opts.fragmentation || 96
+  opts.spoofHTTP = opts.spoofHTTP || true
+  opts.preventRedirect = opts.preventRedirect || true
+  opts.fragmentation = opts.fragmentation || 64
   // NOTE: DNS client;
   opts.dns = opts.dns || {}
   opts.dns.type = opts.dns.type || 'https'
