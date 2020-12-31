@@ -1,3 +1,5 @@
+import compileHeaders from './headers'
+
 const compile = (response = {}) => {
   response.version = response.version || 'HTTP/1.1'
   response.statusCode = response.statusCode || 200
@@ -8,13 +10,7 @@ const compile = (response = {}) => {
 
   packet += `${response.version} ${response.statusCode} ${response.statusMessgae}\r\n`
 
-  const headers = Object.keys(response.headers)
-
-  for (let i = 0, l = headers.length; i < l; i++) {
-    const header = headers[i]
-
-    packet += `${header}: ${response.headers[header]}\r\n`
-  }
+  packet += compileHeaders(response.headers)
 
   packet += '\r\n'
   packet += response.payload
