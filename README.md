@@ -40,8 +40,8 @@ import { proxy } from 'Seia-Soto/GreenTunnel'
 const server = proxy.create({
   port: 8080,
   fragmentation: 64, // NOTE: fragmentation level (buffer length)
-  spoofHTTP: true, // NOTE: spoof pure-HTTP headers
-  preventRedirect: true, // NOTE: prevent being redirected via DPI
+  spoofPacket: true, // NOTE: spoof pure-HTTP headers
+  preventRedirect: true, // NOTE: prevent being redirected via DPI (HTTP 302 Found)
   dns: {
     type: 'https',
     options: {},

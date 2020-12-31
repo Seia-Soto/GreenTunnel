@@ -62,6 +62,12 @@ export default (opts = {}) => {
       })
 
       if (secured) {
+        if (opts.spoofPacket) {
+          const request = http.resolve.request(data)
+
+          data = http.compile.request(request, opts.spoofPacket)
+        }
+
         // NOTE: If client trys to send data to remote;
         connection.once('data', initBuffer => {
           debug('appyling packet fragmentation:', hostname)
@@ -85,7 +91,7 @@ export default (opts = {}) => {
 
           delete request.headers['proxy-connection']
 
-          buffer = http.compile.request(request, opts.spoofHTTP)
+          buffer = http.compile.request(request, opts.spoofPacket)
 
           remote.write(buffer)
         })
@@ -94,7 +100,7 @@ export default (opts = {}) => {
 
         delete request.headers['proxy-connection']
 
-        data = http.compile.request(request, opts.spoofHTTP)
+        data = http.compile.request(request, opts.spoofPacket)
 
         for (let i = 0, l = data.length; i < l; i += opts.fragmentation / 2) {
           remote.write(data.slice(i, i + opts.fragmentation / 2))

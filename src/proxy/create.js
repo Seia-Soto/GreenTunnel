@@ -9,7 +9,7 @@ const debug = createLogger('proxy/create')
 const createProxy = (opts = {}) => {
   // NOTE: App;
   opts.port = opts.port || 8080
-  opts.spoofHTTP = opts.spoofHTTP || true
+  opts.spoofPacket = opts.spoofPacket || true
   opts.preventRedirect = opts.preventRedirect || true
   opts.fragmentation = opts.fragmentation || 64
   // NOTE: DNS client;
