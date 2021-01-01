@@ -14,7 +14,7 @@
   "main": "src/index.cjs.js",
   "module": "src/index.js",
   "scripts": {
-    "test": "cross-env DEBUG=green-tunnel* node -r esm scripts/test"
+    "test": "cross-env DEBUG=* node -r esm scripts/test"
   },
   "dependencies": {
     "debug": "^4.3.1",

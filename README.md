@@ -238,6 +238,89 @@ return {
 }
 ```
 
+### Plugins (`opts.plugins`)
+
+> **Notice**
+>
+> The concept of plugins are not ready for production and may be able to hook everywhere you want.
+> I am adding hook points as I update the source code.
+
+Plugins are first introduced concept on my forked version of GreenTunnel and used to pre-hook or post-hook specific part of processing-logic.
+To make changes easy as you can, plugins can be injected as you want.
+Plugins are executed one by one.
+So if your plugin is in lower priority (higher index in array), means that your plugin will be executed later and will receive already manipulated materials.
+By default, related materials are given to plugin and plugin will pre or post process materials before my GreenTunnel process.
+Plugins have one entry function called `execute` and some meta properties.
+After developing plugin, you can push your plugins into right position of `opts.plugins.<hook>`.
+For example, hooking `beforeInit` is easy as following if you developed a plugin for GreenTunnel (my fork):
+
+```js
+import * as myPlugin from '//somewhere-noone-knows////my-plugin'
+
+const registerPlugin = opts => {
+  opts.plugins.beforeInit = opts.plugins.beforeInit || []
+
+  opts.plugins.beforeInit.push(myPlugin)
+}
+```
+
+To develop a plugin correctly, you need to specify and expose some properties for GreenTunnel (fork) to recognize.
+
+> **Warning**
+>
+> The things you need to expose can be have difference as version changes.
+
+The basic of current plugin concept looks like:
+
+```js
+{
+  execute: async (opts = {}, subject, args) => {
+    console.log(args.hook) // NOTE: The name of hook point. EX) `beforeInit`
+
+    return subject
+  },
+  name: 'The name of plugin'
+}
+```
+
+Your plugin will receive three arguments by default. There is no expand of these argument unless [plugins/inject function](/src/plugins/inject.js) changes.
+All injection is done by that function.
+After your plugin processes the `subject` which your plugin need to manipulate and work with, your plugin need to return modified `subject` object as well.
+The modified `subject` object will be passed to next plugin.
+
+Now, you know what is the basic of GreenTunnel (fork) plugins and find the hook point you want to inject your code in following points.
+
+#### beforeInit (`opts.plugins.beforeInit`)
+
+The plugins that pushed to `opts.plugins.beforeInit` will be used to pre-process `opts` object given from user right after normalization of plugins and DNS clients array.
+
+```js
+{
+  execute: async (opts = {}, subject, args) => {
+    console.log(subject) // NOTE: Same as `opts` you provide when `proxy.create` function called.
+
+    return subject
+  }
+}
+```
+
+- Ref: [proxy/create](/src/proxy/create)
+
+#### afterInit (`opts.plugins.afterInit`)
+
+The plugins that pushed to `opts.plugins.afterInit` will be used to post-process `opts` object given after normalization of plugins and things as well.
+It is after that DNS client and cache clients are already initialized.
+
+- Ref: [proxy/create](/src/proxy/create)
+
+#### serverCreate (`opts.plugins.serverCreate`)
+
+The plugins that pushed to `opts.plugins.serverCreate` will be used to post-process `Server` that accepts client connections.
+
+- Ref:
+  - [proxy/create](/src/proxy/create)
+  - https://nodejs.org/api/net.html#net_net_createserver_options_connectionlistener
+
 # Changes
 
 All implemented changes will be listed here as possible.
@@ -258,6 +341,8 @@ All implemented changes will be listed here as possible.
 - Add DNS clients.
 - Add HOST header obfuscation.
 - Add 302 Found redirect prevention.
+- Add plugin concept.
+- Add `afterInit`, `beforeInit` and `serverCreate` hooking points.
 
 ### Changes
 
