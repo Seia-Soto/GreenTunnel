@@ -7,7 +7,7 @@ import handle from './handle'
 
 const debug = createLogger('proxy/create')
 
-const createProxy = (opts = {}) => {
+const createProxy = async (opts = {}) => {
   // NOTE: App;
   opts.port = opts.port || 8080
   opts.spoofPacket = opts.spoofPacket || true
@@ -33,18 +33,18 @@ const createProxy = (opts = {}) => {
   opts.plugins.afterInit = opts.plugins.afterInit || []
   opts.plugins.serverCreate = opts.plugins.serverCreate || []
 
-  opts = plugins.inject(opts.plugins.beforeInit, opts, { hook: 'beforeInit' })
+  opts = await plugins.inject(opts.plugins.beforeInit, opts, { hook: 'beforeInit' })
 
   debug('initiating with opts:', opts)
 
   opts.dns.cache.client = opts.dns.cache.client || cache[opts.dns.cache.type] || cache.lfu
   opts.dns.client = opts.dns.client || (dns[opts.dns.type] || dns.native)(opts.dns)
 
-  opts = plugins.inject(opts.plugins.afterInit, opts, { hook: 'afterInit' })
+  opts = await plugins.inject(opts.plugins.afterInit, opts, { hook: 'afterInit' })
 
   let server = net.createServer({ pauseOnConnect: true }, handle(opts))
 
-  server = plugins.inject(opts.plugins.serverCreate, server, { hook: 'serverCreate' })
+  server = await plugins.inject(opts.plugins.serverCreate, server, { hook: 'serverCreate' })
 
   server.on('error', error => debug('got an error:', error))
 
